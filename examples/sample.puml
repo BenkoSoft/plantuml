@@ -1,0 +1,22 @@
+@startuml
+title Simple Class Diagram
+
+class User {
+  +String name
+  +void login()
+}
+
+class Order {
+  +int id
+  +double total
+}
+
+class Product {
+  +String name
+  +double price
+}
+
+User --> Order
+Order --> Product
+
+@enduml 

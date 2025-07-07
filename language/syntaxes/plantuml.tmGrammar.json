@@ -1,0 +1,74 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "PlantUML",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#identifiers"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.other.plantuml",
+          "match": "\\b(abstract|actor|agent|archimate|artifact|boundary|card|class|cloud|component|control|database|entity|enum|file|folder|frame|interface|node|object|package|participant|queue|rectangle|state|storage|usecase)\\b"
+        },
+        {
+          "name": "keyword.control.plantuml",
+          "match": "\\b(@startuml|@enduml|@startmindmap|@endmindmap|@startsalt|@endsalt|@startgantt|@endgantt|@startdot|@enddot|@startditaa|@endditaa|@startjcckit|@endjcckit|@startmath|@endmath|@startlatex|@endlatex|@startdef|@enddef|@startsub|@endsub|skinparam|hide|show|title|note|end note|legend|end legend|header|footer|center footer|left footer|right footer|as|is|of|on|activate|deactivate|destroy|create|autonumber|newpage|alt|else|opt|loop|par|break|critical|group|ref over|over|end|return|rnote|hnote|note left|note right|note top|note bottom)\\b"
+        },
+        {
+          "name": "keyword.operator.plantuml",
+          "match": "(\\-\\-\\>|\\-\\>|\\<\\-\\-|\\<\\-|\\-\\-|\\=\\=\\>|\\=\\>|\\<\\=\\=|\\<\\=|\\=\\=|\\:\\:|\\|\\||o\\-\\-|o\\-|\\-\\-o|\\-o|\\*\\-\\-|\\*\\-|\\-\\-\\*|\\-\\*|<\\|\\-\\-|<\\|\\-|\\-\\-\\|>|\\-\\|>|\\-\\-\\-|\\-\\-\\-\\>|<\\-\\-\\-|\\-\\-\\->|<\\-\\-|\\-\\->|<\\-|\\->)"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.plantuml",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.plantuml",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.apostrophe.plantuml",
+          "match": "'.*$"
+        },
+        {
+          "name": "comment.block.plantuml",
+          "begin": "/\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "comment.block.plantuml",
+          "begin": "/'",
+          "end": "'/"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "variable.other.plantuml",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    }
+  },
+  "scopeName": "source.plantuml"
+} 

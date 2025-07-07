@@ -1,0 +1,29 @@
+@startuml
+title Application Deployment
+
+node "Load Balancer" {
+  [NGINX]
+}
+
+node "Web Server 1" {
+  [Web App]
+}
+
+node "Web Server 2" {
+  [Web App]
+}
+
+node "Database Server" {
+  [PostgreSQL]
+}
+
+cloud "CDN" {
+  [Static Files]
+}
+
+[NGINX] --> [Web App] : Server 1
+[NGINX] --> [Web App] : Server 2
+[Web App] --> [PostgreSQL]
+[Web App] --> [Static Files]
+
+@enduml 

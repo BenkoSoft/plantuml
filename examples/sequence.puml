@@ -1,0 +1,16 @@
+@startuml
+title User Login Sequence
+
+actor User
+participant WebApp
+participant AuthService
+database UserDB
+
+User -> WebApp: Enter credentials
+WebApp -> AuthService: Validate user
+AuthService -> UserDB: Check credentials
+UserDB --> AuthService: User data
+AuthService --> WebApp: Authentication result
+WebApp --> User: Login success/failure
+
+@enduml 

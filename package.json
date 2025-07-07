@@ -1,0 +1,144 @@
+{
+  "name": "plantumlviewer",
+  "displayName": "PlantUMLViewer",
+  "description": "Preview PlantUML diagrams in VS Code with syntax highlighting and export options",
+  "version": "1.0.0",
+  "publisher": "your-publisher-name",
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/plantuml-vscode"
+  },
+  "homepage": "https://github.com/your-username/plantuml-vscode#readme",
+  "bugs": {
+    "url": "https://github.com/your-username/plantuml-vscode/issues"
+  },
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "keywords": [
+    "plantumlviewer",
+    "diagram",
+    "preview",
+    "uml",
+    "visualization"
+  ],
+  "activationEvents": [
+    "onLanguage:plantuml",
+    "onCommand:plantumlviewer.preview",
+    "onCommand:plantumlviewer.exportSVG",
+    "onCommand:plantumlviewer.exportPNG"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "plantuml",
+        "aliases": [
+          "PlantUML",
+          "plantuml"
+        ],
+        "extensions": [
+          ".puml",
+          ".plantuml",
+          ".pu"
+        ],
+        "configuration": "./language/language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "plantuml",
+        "scopeName": "source.plantuml",
+        "path": "./language/syntaxes/plantuml.tmGrammar.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "plantumlviewer.preview",
+        "title": "Open Preview",
+        "category": "PlantUMLViewer",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "plantumlviewer.exportSVG",
+        "title": "Export as SVG",
+        "category": "PlantUMLViewer"
+      },
+      {
+        "command": "plantumlviewer.exportPNG",
+        "title": "Export as PNG",
+        "category": "PlantUMLViewer"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "plantumlviewer.preview",
+          "when": "editorLangId == plantuml",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "plantumlviewer.preview",
+          "when": "editorLangId == plantuml",
+          "group": "navigation"
+        },
+        {
+          "command": "plantumlviewer.exportSVG",
+          "when": "editorLangId == plantuml",
+          "group": "export"
+        },
+        {
+          "command": "plantumlviewer.exportPNG",
+          "when": "editorLangId == plantuml",
+          "group": "export"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "PlantUMLViewer",
+      "properties": {
+        "plantumlviewer.server": {
+          "type": "string",
+          "default": "https://www.plantuml.com/plantuml",
+          "description": "PlantUMLViewer server URL"
+        },
+        "plantumlviewer.previewTheme": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark"
+          ],
+          "default": "light",
+          "description": "Preview theme"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "clean": "rm -rf out/",
+    "clean:all": "rm -rf out/ node_modules/ package-lock.json",
+    "rebuild": "npm run clean && npm install && npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/node-fetch": "^2.6.12",
+    "@types/vscode": "^1.74.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0",
+    "plantuml-encoder": "^1.4.0"
+  }
+}

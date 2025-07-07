@@ -1,0 +1,27 @@
+@startuml
+title Web Application Components
+
+package "Frontend" {
+  [Web UI]
+  [Mobile App]
+}
+
+package "Backend" {
+  [API Gateway]
+  [User Service]
+  [Order Service]
+}
+
+package "Data Layer" {
+  [User Database]
+  [Order Database]
+}
+
+[Web UI] --> [API Gateway]
+[Mobile App] --> [API Gateway]
+[API Gateway] --> [User Service]
+[API Gateway] --> [Order Service]
+[User Service] --> [User Database]
+[Order Service] --> [Order Database]
+
+@enduml 
