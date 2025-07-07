@@ -1,97 +1,48 @@
-# PlantUML Preview Extension for VS Code
+# PlantUML Viewer 🌿
 
-This extension provides PlantUML diagram rendering and preview capabilities directly in Visual Studio Code.
+A simple VS Code extension that lets you preview and export PlantUML diagrams right in your editor.
 
-## Features
+## Features ✨
 
-- **Live Preview**: Preview PlantUML diagrams in a side-by-side webview panel
-- **Syntax Highlighting**: Full syntax highlighting for PlantUML files
-- **Export Options**: Export diagrams as SVG or PNG
-- **Multiple File Types**: Supports `.puml`, `.plantuml`, and `.pu` file extensions
-- **Real-time Updates**: Preview automatically updates as you type
+- **Live Preview**: See your diagrams update as you type
+- **Export Options**: Save your diagrams as SVG or PNG
+- **Syntax Highlighting**: Makes your PlantUML code beautiful
 
-## Installation
+## Usage 🚀
 
-1. Clone or download this extension
-2. Open the folder in VS Code
-3. Run `npm install` to install dependencies
-4. Run `npm run compile` to build the extension
-5. Press `F5` to launch a new Extension Development Host window
+1. Open a `.puml` file
+2. Click the preview icon in the editor title bar
+3. Watch your diagram come to life!
 
-## Usage
+## Examples 📝
 
-### Opening a Preview
-
-1. Open a PlantUML file (`.puml`, `.plantuml`, or `.pu`)
-2. Use one of these methods to open the preview:
-   - Click the preview button in the editor title bar
-   - Right-click in the editor and select "Open Preview"
-   - Use the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run "PlantUML: Open Preview"
-
-### Exporting Diagrams
-
-- **Export as SVG**: Right-click in the editor and select "Export as SVG"
-- **Export as PNG**: Right-click in the editor and select "Export as PNG"
-
-### Configuration
-
-The extension can be configured through VS Code settings:
-
-- `plantuml.server`: PlantUML server URL (default: "https://www.plantuml.com/plantuml")
-- `plantuml.previewTheme`: Preview theme - "light" or "dark" (default: "light")
-
-## Supported PlantUML Syntax
-
-The extension supports standard PlantUML syntax including:
-
-- Class diagrams
-- Sequence diagrams
-- Use case diagrams
-- Activity diagrams
-- Component diagrams
-- State diagrams
-- And more!
-
-## Example
-
-Create a file named `example.puml` with the following content:
+Create sequence diagrams:
 
 ```plantuml
 @startuml
-title Simple Class Diagram
-
-class User {
-  +String name
-  +String email
-  +void login()
-}
-
-class Order {
-  +int id
-  +Date date
-  +void process()
-}
-
-User ||--o{ Order : places
+Alice -> Bob: Hello!
+Bob --> Alice: Hi there!
 @enduml
 ```
 
-Then open the preview to see the rendered diagram!
+Or class diagrams:
 
-## Requirements
+```plantuml
+@startuml
+class Car {
+  +start()
+  +stop()
+}
+@enduml
+```
 
-- VS Code 1.74.0 or higher
-- Internet connection (for rendering diagrams via PlantUML server)
+## Installation 📦
 
-## Known Issues
+1. Open VS Code
+2. Go to Extensions (Ctrl+Shift+X)
+3. Search for "PlantUML Viewer"
+4. Click Install
 
-- Large diagrams may take some time to render
-- Network connectivity required for diagram generation
+## License 📄
 
-## Contributing
-
-Feel free to contribute by submitting issues or pull requests!
-
-## License
-
-This extension is provided as-is for educational and development purposes. 
+MIT - feel free to use and modify!
