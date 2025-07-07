@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { PlantUMLService } from '../services/plantUMLService';
+import fetch from 'node-fetch';
 
 export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
     public static readonly viewType = 'plantumlviewer.preview';
@@ -9,26 +10,26 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
     private readonly _extensionUri: vscode.Uri;
     private readonly _plantUMLService: PlantUMLService;
     private _disposables: vscode.Disposable[] = [];
+    private _currentContent: string = '';
 
     public static createOrShow(extensionUri: vscode.Uri, plantUMLService: PlantUMLService) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
 
-        // If we already have a panel, show it.
         if (PlantUMLPreviewProvider.currentPanel) {
             PlantUMLPreviewProvider.currentPanel._panel.reveal(column);
             PlantUMLPreviewProvider.currentPanel.update();
             return;
         }
 
-        // Otherwise, create a new panel.
         const panel = vscode.window.createWebviewPanel(
             PlantUMLPreviewProvider.viewType,
             'PlantUML Preview',
             column || vscode.ViewColumn.One,
             {
                 enableScripts: true,
+                retainContextWhenHidden: true,
                 localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')]
             }
         );
@@ -51,19 +52,79 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
         this._extensionUri = extensionUri;
         this._plantUMLService = plantUMLService;
 
-        // Set the webview's initial html content
         this.update();
 
-        // Listen for when the panel is disposed
-        // This happens when the user closes the panel or when the panel is closed programmatically
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+        // Update content when the panel is revealed
+        this._panel.onDidChangeViewState(e => {
+            if (this._panel.visible) {
+                this.update();
+            }
+        }, null, this._disposables);
 
         // Handle messages from the webview
         this._panel.webview.onDidReceiveMessage(
-            (message: any) => {
+            async (message: any) => {
+                if (!this._currentContent || !this._plantUMLService.isValidPlantUMLCode(this._currentContent)) {
+                    vscode.window.showWarningMessage('No valid PlantUML diagram is currently being previewed.');
+                    return;
+                }
+
+                const getDefaultFilename = () => {
+                    const editor = vscode.window.activeTextEditor;
+                    if (editor && editor.document.languageId === 'plantuml') {
+                        return editor.document.fileName;
+                    }
+                    return 'diagram';
+                };
+
                 switch (message.command) {
-                    case 'alert':
-                        vscode.window.showErrorMessage(message.text);
+                    case 'exportSVG':
+                        try {
+                            const svgContent = await this._plantUMLService.generateSVG(this._currentContent);
+                            const uri = await vscode.window.showSaveDialog({
+                                defaultUri: vscode.Uri.file(getDefaultFilename().replace(/\.(puml|plantuml|pu)$/, '.svg')),
+                                filters: {
+                                    'SVG files': ['svg']
+                                },
+                                title: 'Save PlantUML diagram as SVG'
+                            });
+                            if (uri) {
+                                await vscode.workspace.fs.writeFile(uri, Buffer.from(svgContent));
+                                vscode.window.showInformationMessage('SVG exported successfully!', 'Open File').then(selection => {
+                                    if (selection === 'Open File') {
+                                        vscode.commands.executeCommand('vscode.open', uri);
+                                    }
+                                });
+                            }
+                        } catch (error) {
+                            vscode.window.showErrorMessage(`Failed to export SVG: ${error}`);
+                        }
+                        return;
+                    case 'exportPNG':
+                        try {
+                            const pngUrl = this._plantUMLService.generatePNGUrl(this._currentContent);
+                            const uri = await vscode.window.showSaveDialog({
+                                defaultUri: vscode.Uri.file(getDefaultFilename().replace(/\.(puml|plantuml|pu)$/, '.png')),
+                                filters: {
+                                    'PNG files': ['png']
+                                },
+                                title: 'Save PlantUML diagram as PNG'
+                            });
+                            if (uri) {
+                                const response = await fetch(pngUrl);
+                                const arrayBuffer = await response.arrayBuffer();
+                                await vscode.workspace.fs.writeFile(uri, new Uint8Array(arrayBuffer));
+                                vscode.window.showInformationMessage('PNG exported successfully!', 'Open File').then(selection => {
+                                    if (selection === 'Open File') {
+                                        vscode.commands.executeCommand('vscode.open', uri);
+                                    }
+                                });
+                            }
+                        } catch (error) {
+                            vscode.window.showErrorMessage(`Failed to export PNG: ${error}`);
+                        }
                         return;
                 }
             },
@@ -72,33 +133,16 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
         );
     }
 
-    public async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any): Promise<void> {
-        // Restore the panel
-        PlantUMLPreviewProvider.currentPanel = new PlantUMLPreviewProvider(
-            webviewPanel, 
-            this._extensionUri, 
-            this._plantUMLService
-        );
-    }
-
-    public dispose() {
-        PlantUMLPreviewProvider.currentPanel = undefined;
-
-        // Clean up our resources
-        this._panel.dispose();
-
-        while (this._disposables.length) {
-            const x = this._disposables.pop();
-            if (x) {
-                x.dispose();
-            }
-        }
-    }
-
     public update() {
-        const webview = this._panel.webview;
-        this._panel.title = 'PlantUML Preview';
-        this._panel.webview.html = this._getHtmlForWebview(webview);
+        const editor = vscode.window.activeTextEditor;
+        if (editor && editor.document.languageId === 'plantuml') {
+            this._currentContent = editor.document.getText();
+        }
+        this._updateWebview();
+    }
+
+    private _updateWebview() {
+        this._panel.webview.html = this._getHtmlForWebview(this._panel.webview);
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
@@ -112,10 +156,21 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                 imageUrl = this._plantUMLService.generateSVGUrl(plantUMLCode);
                 content = `<img src="${imageUrl}" alt="PlantUML Diagram" style="max-width: 100%; height: auto;">`;
             } else {
-                content = '<p>No valid PlantUML diagram found. Make sure your file contains @startuml and @enduml tags.</p>';
+                content = `
+                    <div class="error-container">
+                        <div class="error-message">
+                            No valid PlantUML diagram found.<br>
+                            Make sure your file contains @startuml and @enduml tags.
+                        </div>
+                    </div>`;
             }
         } else {
-            content = '<p>Open a PlantUML file (.puml, .plantuml, .pu) to see the preview.</p>';
+            content = `
+                <div class="error-container">
+                    <div class="error-message">
+                        Open a PlantUML file (.puml, .plantuml, .pu) to see the preview.
+                    </div>
+                </div>`;
         }
 
         return `<!DOCTYPE html>
@@ -130,8 +185,11 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                         font-size: var(--vscode-font-size);
                         color: var(--vscode-foreground);
                         background-color: var(--vscode-editor-background);
-                        padding: 20px;
+                        padding: 0;
                         margin: 0;
+                        display: flex;
+                        flex-direction: column;
+                        min-height: 100vh;
                     }
                     img {
                         display: block;
@@ -141,17 +199,22 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                         padding: 10px;
                         border-radius: 4px;
                     }
-                    p {
+                    .error-container {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex: 1;
+                        min-height: 100vh;
+                        padding: 20px;
+                    }
+                    .error-message {
                         text-align: center;
                         opacity: 0.7;
-                    }
-                    .error {
-                        color: var(--vscode-errorForeground);
-                        background-color: var(--vscode-inputValidation-errorBackground);
-                        border: 1px solid var(--vscode-inputValidation-errorBorder);
-                        padding: 10px;
-                        border-radius: 4px;
-                        margin: 10px 0;
+                        padding: 20px;
+                        border: 1px solid var(--vscode-inputValidation-infoBackground);
+                        border-radius: 6px;
+                        background-color: var(--vscode-editor-background);
+                        line-height: 1.6;
                     }
                 </style>
             </head>
@@ -165,14 +228,36 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                     if (img) {
                         img.onerror = function() {
                             this.style.display = 'none';
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'error';
-                            errorDiv.textContent = 'Failed to load PlantUML diagram. Please check your diagram syntax or server connection.';
-                            this.parentNode.appendChild(errorDiv);
+                            const errorContainer = document.createElement('div');
+                            errorContainer.className = 'error-container';
+                            const errorMessage = document.createElement('div');
+                            errorMessage.className = 'error-message';
+                            errorMessage.innerHTML = 'Failed to load PlantUML diagram.<br>Please check your diagram syntax or server connection.';
+                            errorContainer.appendChild(errorMessage);
+                            document.body.appendChild(errorContainer);
                         };
                     }
                 </script>
             </body>
             </html>`;
+    }
+
+    public dispose() {
+        PlantUMLPreviewProvider.currentPanel = undefined;
+        this._panel.dispose();
+        while (this._disposables.length) {
+            const x = this._disposables.pop();
+            if (x) {
+                x.dispose();
+            }
+        }
+    }
+
+    public async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any): Promise<void> {
+        PlantUMLPreviewProvider.currentPanel = new PlantUMLPreviewProvider(
+            webviewPanel,
+            this._extensionUri,
+            this._plantUMLService
+        );
     }
 } 

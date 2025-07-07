@@ -66,13 +66,14 @@
         "icon": "$(open-preview)"
       },
       {
-        "command": "plantumlviewer.exportSVG",
-        "title": "Export as SVG",
-        "category": "PlantUMLViewer"
+        "command": "plantumlviewer.exportPNG",
+        "title": "Export Diagram",
+        "category": "PlantUMLViewer",
+        "icon": "$(file-binary)"
       },
       {
-        "command": "plantumlviewer.exportPNG",
-        "title": "Export as PNG",
+        "command": "plantumlviewer.exportSVG",
+        "title": "Export as SVG",
         "category": "PlantUMLViewer"
       }
     ],
@@ -80,6 +81,11 @@
       "editor/title": [
         {
           "command": "plantumlviewer.preview",
+          "when": "editorLangId == plantuml",
+          "group": "navigation"
+        },
+        {
+          "command": "plantumlviewer.exportPNG",
           "when": "editorLangId == plantuml",
           "group": "navigation"
         }
@@ -91,14 +97,9 @@
           "group": "navigation"
         },
         {
-          "command": "plantumlviewer.exportSVG",
-          "when": "editorLangId == plantuml",
-          "group": "export"
-        },
-        {
           "command": "plantumlviewer.exportPNG",
           "when": "editorLangId == plantuml",
-          "group": "export"
+          "group": "export@1"
         }
       ]
     },

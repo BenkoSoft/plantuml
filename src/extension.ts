@@ -39,7 +39,19 @@ export function activate(context: vscode.ExtensionContext) {
                         });
                         if (uri) {
                             await vscode.workspace.fs.writeFile(uri, Buffer.from(svgContent));
-                            vscode.window.showInformationMessage('SVG exported successfully!');
+                            const openFileAction = 'Open File';
+                            const showInFolderAction = 'Show in Folder';
+                            const result = await vscode.window.showInformationMessage(
+                                'SVG exported successfully!',
+                                { modal: false, detail: uri.fsPath },
+                                openFileAction,
+                                showInFolderAction
+                            );
+                            if (result === openFileAction) {
+                                await vscode.commands.executeCommand('vscode.open', uri);
+                            } else if (result === showInFolderAction) {
+                                await vscode.commands.executeCommand('revealFileInOS', uri);
+                            }
                         }
                     } catch (error) {
                         vscode.window.showErrorMessage(`Failed to export SVG: ${error}`);
@@ -56,7 +68,30 @@ export function activate(context: vscode.ExtensionContext) {
                 if (editor && editor.document.languageId === 'plantuml') {
                     try {
                         const pngUrl = plantUMLService.generatePNGUrl(editor.document.getText());
-                        vscode.env.openExternal(vscode.Uri.parse(pngUrl));
+                        const uri = await vscode.window.showSaveDialog({
+                            filters: {
+                                'PNG files': ['png']
+                            }
+                        });
+                        if (uri) {
+                            const response = await fetch(pngUrl);
+                            const arrayBuffer = await response.arrayBuffer();
+                            const buffer = Buffer.from(arrayBuffer);
+                            await vscode.workspace.fs.writeFile(uri, buffer);
+                            const openFileAction = 'Open File';
+                            const showInFolderAction = 'Show in Folder';
+                            const result = await vscode.window.showInformationMessage(
+                                'PNG exported successfully!',
+                                { modal: false, detail: uri.fsPath },
+                                openFileAction,
+                                showInFolderAction
+                            );
+                            if (result === openFileAction) {
+                                vscode.env.openExternal(vscode.Uri.file(uri.fsPath));
+                            } else if (result === showInFolderAction) {
+                                await vscode.commands.executeCommand('revealFileInOS', uri);
+                            }
+                        }
                     } catch (error) {
                         vscode.window.showErrorMessage(`Failed to export PNG: ${error}`);
                     }
