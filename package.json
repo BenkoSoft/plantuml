@@ -4,20 +4,24 @@
   "description": "Preview PlantUML diagrams in VS Code with syntax highlighting and export options",
   "version": "1.0.0",
   "publisher": "BenkoSoftware",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
     "Visualization",
-    "Programming Languages"
+    "Programming Languages",
+    "Formatters",
+    "Snippets",
+    "Other"
   ],
   "keywords": [
     "plantuml",
     "uml",
     "diagram",
-    "preview"
+    "preview",
+    "architecture"
   ],
   "activationEvents": [
     "onLanguage:plantuml"
