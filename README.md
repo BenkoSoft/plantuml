@@ -6,13 +6,13 @@ A powerful VS Code extension for previewing and exporting PlantUML diagrams dire
 
 ## Features ✨
 
-- **Live Preview**: See your diagrams update in real-time as you type
-- **Natural Interactions**: Zoom to cursor with Ctrl/Cmd+Scroll, pan by dragging, and use zoom controls
-- **Export Options**: Save your diagrams as SVG or PNG with one click
-- **Syntax Highlighting**: Makes your PlantUML code beautiful and easy to read
-- **Multiple Diagram Types**: Support for sequence, class, component, deployment, and more
-- **Context Menu Integration**: Quick access to preview and export options
-- **Online Rendering**: Uses PlantUML's online server - no local installation needed
+* **Live Preview**: See your diagrams update in real-time as you type
+* **Simple Zoom**: Use mouse wheel to zoom in/out, drag to pan
+* **Export Options**: Save your diagrams as SVG or PNG with one click
+* **Syntax Highlighting**: Makes your PlantUML code beautiful and easy to read
+* **Multiple Diagram Types**: Support for sequence, class, component, deployment, and more
+* **Context Menu Integration**: Quick access to preview and export options
+* **Online Rendering**: Uses PlantUML's online server - no local installation needed
 
 ## Usage 🚀
 
@@ -20,23 +20,22 @@ A powerful VS Code extension for previewing and exporting PlantUML diagrams dire
 2. Click the preview icon (🔍) in the editor title bar
 3. Watch your diagram come to life in the preview panel!
 
-### Natural Diagram Interactions 🖱️
+### Diagram Controls 🖱️
 
-- **Zoom**: Hold Ctrl/Cmd and scroll to zoom in/out at cursor position
-- **Pan**: Click and drag to move around the diagram
-- **Quick Zoom**: Use the zoom controls (+/-) in the preview panel
-- **Reset**: Click the percentage to reset zoom and center the diagram
+* **Zoom**: Use mouse wheel to zoom in/out
+* **Pan**: Click and drag to move around the diagram
+* **Reset**: Click the reset button to restore default view
 
 ### Export Your Diagrams 📤
 
 Right-click in your PlantUML file and choose:
-- "Export as PNG" for bitmap images
-- "Export as SVG" for vector graphics
+* "Export as PNG" for bitmap images
+* "Export as SVG" for vector graphics
 
 ## Requirements 📋
 
-- Visual Studio Code version 1.74.0 or higher
-- Internet connection for diagram rendering
+* Visual Studio Code version 1.74.0 or higher
+* Internet connection for diagram rendering
 
 ## Installation 📦
 
@@ -48,15 +47,15 @@ Right-click in your PlantUML file and choose:
 ## Configuration ⚙️
 
 Access settings through VS Code's settings (Ctrl+,):
-- `plantumlviewer.server`: Configure custom PlantUML server URL (default: https://www.plantuml.com/plantuml)
+* `plantumlviewer.server`: Configure custom PlantUML server URL (default: https://www.plantuml.com/plantuml)
 
 ## Support 💬
 
-For issues and feature requests, please contact BenkoSoftware directly.
+For issues and feature requests, please visit our [GitHub repository](https://github.com/BenkoSoft/plantuml/issues).
 
 ## License 📄
 
-© 2024 BenkoSoftware. All Rights Reserved.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
