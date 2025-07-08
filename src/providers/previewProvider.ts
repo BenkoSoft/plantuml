@@ -56,14 +56,12 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
 
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-        // Update content when the panel is revealed
         this._panel.onDidChangeViewState(e => {
             if (this._panel.visible) {
                 this.update();
             }
         }, null, this._disposables);
 
-        // Handle messages from the webview
         this._panel.webview.onDidReceiveMessage(
             async (message: any) => {
                 if (!this._currentContent || !this._plantUMLService.isValidPlantUMLCode(this._currentContent)) {
@@ -81,13 +79,11 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
 
                 switch (message.command) {
                     case 'exportSVG':
-                        try {
+                        await this._exportWithProgress('Exporting SVG...', async () => {
                             const svgContent = await this._plantUMLService.generateSVG(this._currentContent);
                             const uri = await vscode.window.showSaveDialog({
                                 defaultUri: vscode.Uri.file(getDefaultFilename().replace(/\.(puml|plantuml|pu)$/, '.svg')),
-                                filters: {
-                                    'SVG files': ['svg']
-                                },
+                                filters: { 'SVG files': ['svg'] },
                                 title: 'Save PlantUML diagram as SVG'
                             });
                             if (uri) {
@@ -98,18 +94,15 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                                     }
                                 });
                             }
-                        } catch (error) {
-                            vscode.window.showErrorMessage(`Failed to export SVG: ${error}`);
-                        }
+                        });
                         return;
+
                     case 'exportPNG':
-                        try {
+                        await this._exportWithProgress('Exporting PNG...', async () => {
                             const pngUrl = this._plantUMLService.generatePNGUrl(this._currentContent);
                             const uri = await vscode.window.showSaveDialog({
                                 defaultUri: vscode.Uri.file(getDefaultFilename().replace(/\.(puml|plantuml|pu)$/, '.png')),
-                                filters: {
-                                    'PNG files': ['png']
-                                },
+                                filters: { 'PNG files': ['png'] },
                                 title: 'Save PlantUML diagram as PNG'
                             });
                             if (uri) {
@@ -122,9 +115,7 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                                     }
                                 });
                             }
-                        } catch (error) {
-                            vscode.window.showErrorMessage(`Failed to export PNG: ${error}`);
-                        }
+                        });
                         return;
                 }
             },
@@ -154,7 +145,15 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
             const plantUMLCode = editor.document.getText();
             if (this._plantUMLService.isValidPlantUMLCode(plantUMLCode)) {
                 imageUrl = this._plantUMLService.generateSVGUrl(plantUMLCode);
-                content = `<img src="${imageUrl}" alt="PlantUML Diagram" style="max-width: 100%; height: auto;">`;
+                content = `
+                    <div class="diagram-container">
+                        <div class="spinner">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                        <img src="${imageUrl}" alt="PlantUML Diagram" style="max-width: 100%; height: auto;">
+                    </div>`;
             } else {
                 content = `
                     <div class="error-container">
@@ -191,6 +190,14 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                         flex-direction: column;
                         min-height: 100vh;
                     }
+                    .diagram-container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 100vh;
+                        position: relative;
+                    }
                     img {
                         display: block;
                         margin: 0 auto;
@@ -198,6 +205,11 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                         background-color: white;
                         padding: 10px;
                         border-radius: 4px;
+                        opacity: 0;
+                        transition: opacity 0.3s ease-in-out;
+                    }
+                    img.loaded {
+                        opacity: 1;
                     }
                     .error-container {
                         display: flex;
@@ -216,6 +228,38 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                         background-color: var(--vscode-editor-background);
                         line-height: 1.6;
                     }
+                    .spinner {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        width: 70px;
+                        text-align: center;
+                        z-index: 1;
+                    }
+                    .spinner > div {
+                        width: 12px;
+                        height: 12px;
+                        background-color: var(--vscode-button-background);
+                        border-radius: 100%;
+                        display: inline-block;
+                        animation: bounce 1.4s infinite ease-in-out both;
+                        margin: 0 2px;
+                    }
+                    .spinner .bounce1 {
+                        animation-delay: -0.32s;
+                    }
+                    .spinner .bounce2 {
+                        animation-delay: -0.16s;
+                    }
+                    @keyframes bounce {
+                        0%, 80%, 100% { 
+                            transform: scale(0);
+                        } 
+                        40% { 
+                            transform: scale(1.0);
+                        }
+                    }
                 </style>
             </head>
             <body>
@@ -223,11 +267,22 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                 <script>
                     const vscode = acquireVsCodeApi();
                     
-                    // Handle image load errors
+                    // Handle image loading
                     const img = document.querySelector('img');
                     if (img) {
+                        img.onload = function() {
+                            this.classList.add('loaded');
+                            const spinner = document.querySelector('.spinner');
+                            if (spinner) {
+                                spinner.style.display = 'none';
+                            }
+                        };
                         img.onerror = function() {
                             this.style.display = 'none';
+                            const spinner = document.querySelector('.spinner');
+                            if (spinner) {
+                                spinner.style.display = 'none';
+                            }
                             const errorContainer = document.createElement('div');
                             errorContainer.className = 'error-container';
                             const errorMessage = document.createElement('div');
@@ -240,6 +295,22 @@ export class PlantUMLPreviewProvider implements vscode.WebviewPanelSerializer {
                 </script>
             </body>
             </html>`;
+    }
+
+    private async _exportWithProgress(title: string, operation: () => Promise<void>): Promise<void> {
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: title,
+            cancellable: false
+        }, async (progress) => {
+            progress.report({ increment: 0 });
+            try {
+                await operation();
+                progress.report({ increment: 100 });
+            } catch (error) {
+                throw error;
+            }
+        });
     }
 
     public dispose() {
