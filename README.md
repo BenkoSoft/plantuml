@@ -7,6 +7,7 @@ A powerful VS Code extension for previewing and exporting PlantUML diagrams dire
 ## Features ✨
 
 - **Live Preview**: See your diagrams update in real-time as you type
+- **Natural Interactions**: Zoom to cursor with Ctrl/Cmd+Scroll, pan by dragging, and use zoom controls
 - **Export Options**: Save your diagrams as SVG or PNG with one click
 - **Syntax Highlighting**: Makes your PlantUML code beautiful and easy to read
 - **Multiple Diagram Types**: Support for sequence, class, component, deployment, and more
@@ -18,6 +19,13 @@ A powerful VS Code extension for previewing and exporting PlantUML diagrams dire
 1. Open a `.puml`, `.plantuml`, or `.pu` file
 2. Click the preview icon (🔍) in the editor title bar
 3. Watch your diagram come to life in the preview panel!
+
+### Natural Diagram Interactions 🖱️
+
+- **Zoom**: Hold Ctrl/Cmd and scroll to zoom in/out at cursor position
+- **Pan**: Click and drag to move around the diagram
+- **Quick Zoom**: Use the zoom controls (+/-) in the preview panel
+- **Reset**: Click the percentage to reset zoom and center the diagram
 
 ### Export Your Diagrams 📤
 

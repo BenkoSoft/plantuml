@@ -2,9 +2,21 @@
   "name": "plantumlviewer",
   "displayName": "PlantUML Viewer",
   "description": "Preview PlantUML diagrams in VS Code with syntax highlighting and export options",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "BenkoSoftware",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BenkoSoft/plantuml.git"
+  },
+  "homepage": "https://github.com/BenkoSoft/plantuml#readme",
+  "bugs": {
+    "url": "https://github.com/BenkoSoft/plantuml/issues"
+  },
+  "author": {
+    "name": "BenkoSoftware",
+    "url": "https://github.com/BenkoSoft"
+  },
   "icon": "media/icon.png",
   "engines": {
     "vscode": "^1.74.0"
@@ -112,12 +124,11 @@
   },
   "devDependencies": {
     "@types/node": "16.x",
-    "@types/node-fetch": "^2.6.12",
     "@types/vscode": "^1.74.0",
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "node-fetch": "^2.7.0",
-    "plantuml-encoder": "^1.4.0"
+    "plantuml-encoder": "^1.4.0",
+    "panzoom": "^9.4.3"
   }
 }
